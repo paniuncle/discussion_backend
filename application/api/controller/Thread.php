@@ -25,6 +25,11 @@ class Thread
         }
         $dataContent = $dbThreadContent->where("tid = $tid")->find();
 
+        $dbThread = new \app\api\model\Thread();
+
+        $dbThread->where("tid = $tid")->setInc('view',1);
+
+
         return json(['errcode'=> 0, 'message'=> 'everything is ok', 'thread'=>['base'=>$dataBase,'content'=>$dataContent]]);
 
     }
@@ -57,6 +62,9 @@ class Thread
         $dbCommentContent->content = $content;
         $dbCommentContent->save();
 
+        $dbThread = new \app\api\model\Thread();
+        $dbThread->where("tid = $tid")->setInc('reply',1);
+
         return json(['errcode'=>0, 'message'=>'create comment success']);
     }
 
@@ -79,7 +87,7 @@ class Thread
         $dbCommentContent = new CommentContentModel();
         $dbUser = new UserModel();
 
-        $dataComment = $dbComment->where("tid = $tid AND status = 0")->page($page,20)->select();
+        $dataComment = $dbComment->where("tid = $tid AND status = 0")->order('cid','desc')->page($page,20)->select();
 
         // 获取评论内容
         for($i=0;$i<count($dataComment);$i++){
@@ -113,6 +121,10 @@ class Thread
         $cid = input("post.cid");
         $dbComment = new CommentModel();
         $dbComment->save(['status'=> 1], ['cid'=>$cid]);
+        $tid = $dbComment->tid;
+
+        $dbThread = new \app\api\model\Thread();
+        $dbThread->where("tid = $tid")->setDec('reply',1);
 
         return json(['errcode'=>0, 'message'=>'delete reply success']);
 
@@ -133,7 +145,6 @@ class Thread
         $tid = input("post.tid");
         $dbThread = new ThreadModel();
         $dbThread->save(['status'=>1], ['tid'=>$tid]);
-
         return json(['errcode'=>0, 'message'=>'delete Thread success']);
 
     }

@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\api\model\User as UserModel;
 use app\api\model\Thread as ThreadModel;
 use app\api\model\UserGroup as UserGroupModel;
+use app\api\model\Division as DivisionModel;
 use think\Config;
 use think\Request;
 
@@ -195,6 +196,45 @@ class AdminBoard
         config('web_desc', $desc);
         config("web_keywords", $keywords);
         return json(['errcode'=>0, 'message'=>'set success']);
+    }
+
+    function addDiv(){
+        allowCross();
+        passOptions();
+        $authR = AuthenticateSession();
+        $authG1 = AuthenticateGroup(2,Request::instance()->header('uid'));
+        if($authR == false){
+            return json(['errcode'=>1001, 'message'=>'Authentication Failure']);
+        }else if($authG1 == false){
+            return json(['errcode'=>1001, 'message'=>'Authentication Failure']);
+        }
+        $div_name = input("div_name");
+        $div_desc = input("div_desc");
+
+        $db_div = new DivisionModel();
+        $db_div->name = $div_name;
+        $db_div->desc = $div_desc;
+        $db_div->save();
+        return json(['errcode'=>0, 'msg'=>'ok']);
+
+    }
+
+    function delDiv(){
+        allowCross();
+        passOptions();
+        $authR = AuthenticateSession();
+        $authG1 = AuthenticateGroup(2,Request::instance()->header('uid'));
+        if($authR == false){
+            return json(['errcode'=>1001, 'message'=>'Authentication Failure']);
+        }else if($authG1 == false){
+            return json(['errcode'=>1001, 'message'=>'Authentication Failure']);
+        }
+
+        $div_id = input("div_id");
+
+        $db_div = new DivisionModel();
+        $db_div->save(['status'=>1],['did'=>$div_id]);
+        return json(['errcode'=>0, 'msg'=>'ok']);
     }
 
 

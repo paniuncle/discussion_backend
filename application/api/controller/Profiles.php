@@ -35,7 +35,7 @@ class Profiles
         $avatar = request()->file('avatar');
         // 移动到框架应用根目录/public/uploads/ 目录下
         if($avatar){
-            $info = $avatar->validate(['size'=>1048576,'ext'=>'jpg,png,gif'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+            $info = $avatar->validate(['size'=>1048576,'ext'=>'jpg,png,gif,jpeg'])->move(ROOT_PATH . 'public' . DS . 'uploads');
             if($info){
                 // 成功上传后 获取上传信息
                 $dbUser = new UserModel();
